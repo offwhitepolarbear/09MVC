@@ -22,7 +22,6 @@ import com.model2.mvc.service.domain.Purchase;
 import com.model2.mvc.service.domain.User;
 import com.model2.mvc.service.product.ProductService;
 import com.model2.mvc.service.purchase.PurchaseService;
-import com.model2.mvc.service.user.UserService;
 
 //==> 회원관리 Controller
 @Controller
@@ -55,11 +54,12 @@ public class PurchaseController {
 	
 	//@RequestMapping("/addPurchaseView.do")
 	@RequestMapping( value="addPurchase/{prodNo}", method=RequestMethod.GET )
-	public String addPurchaseView(@PathVariable String prodNo, Model model) throws Exception {
+	public String addPurchaseView(@PathVariable String prodNo, Model model, HttpSession session) throws Exception {
 
+		User user = (User)session.getAttribute("user");
 		System.out.println("/purchase/addPurchase :GET ");
 		model.addAttribute("product", productService.getProduct(Integer.parseInt(prodNo)));
-		
+		model.addAttribute("user", user);
 		return "forward:/purchase/addPurchaseView.jsp";
 	}
 	
@@ -70,8 +70,10 @@ public class PurchaseController {
 		System.out.println("/purchase/addPurchase : POST");
 		//Business Logic
 		purchase.setBuyer(user);
+		purchase.setDivyDate(purchase.getDivyDate().substring(2).replace("-", "/"));
 		purchase.setPurchaseProd(product);
 		purchaseService.addPurchase(purchase);
+		purchaseService.stockPurchase(purchase);
 		
 		return "redirect:/purchase/listPurchase";
 	}
@@ -83,6 +85,7 @@ public class PurchaseController {
 		System.out.println("/getPurchaseo");
 		//Business Logic
 		Purchase purchase = purchaseService.getPurchase(Integer.parseInt(tranNo));
+		purchase.setDivyDate(purchase.getDivyDate().substring(0,10));
 		// Model 과 View 연결
 		model.addAttribute("purchase", purchase);
 		

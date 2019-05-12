@@ -31,6 +31,22 @@ public class ProductDaoImpl implements ProductDao {
 		// TODO Auto-generated method stub
 		sqlSession.insert("ProductMapper.addProduct", product);		
 	}
+	
+	public void addStock(Product product) throws Exception {
+		// TODO Auto-generated method stub
+		sqlSession.insert("ProductMapper.addStock", product);		
+	}
+	
+	public void restock(Product product) throws Exception {
+		// TODO Auto-generated method stub
+		sqlSession.update("ProductMapper.restock", product);		
+	}
+	
+	@Override
+	public int getProdNo(Product product) throws Exception {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("ProductMapper.getProdNo", product);
+	}
 
 	@Override
 	public Product getProduct(int prodNo) throws Exception {
@@ -56,4 +72,5 @@ public class ProductDaoImpl implements ProductDao {
 		return sqlSession.selectOne("ProductMapper.getTotalCount", search);
 	}
 
+	
 }

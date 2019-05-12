@@ -15,7 +15,7 @@
 <script type="text/javascript">
 	// 검색 / page 두가지 경우 모두 Form 전송을 위해 JavaScrpt 이용  
 	
-$(function() {
+$(function() {  
 		
 	$("a.pageNumber").on("click" , function() {
 		$("#currentPage").val($(this).text());
@@ -167,12 +167,12 @@ function fncListSale(input) {
 						<a href="/product/getProduct?prodNo=${i.prodNo}&menu=${menu}">
 						${i.prodName}</a>
 						</c:if>
-						<c:if test="${user.role=='admin' && (i.proTranCode=='1  '||i.proTranCode=='2  '||i.proTranCode=='3  ') }">
+						<c:if test="${user.role=='admin' && i.stock == 0 }">
 						<td align="left">
 						<a href="/product/getProduct?prodNo=${i.prodNo}&menu=${menu}">
 						${i.prodName}</a>
 						</c:if>
-						<c:if test="${user.role=='admin' && (empty i.proTranCode || i.proTranCode=='4  ') }">
+						<c:if test="${user.role=='admin' && i.stock != 0}">
 						<td align="left">
 						<a href="/product/updateProduct?prodNo=${i.prodNo}&menu=${menu}">
 						${i.prodName}</a>

@@ -7,38 +7,49 @@
 <mapper namespace="PurchaseMapper">
 
 <resultMap id="purchaseMap" type="purchase">
+	<result property="buyer.userId" 			column="buyer_id" />
 
-	<result property="buyer.userId" 					column="buyer_id" />
-	<result property="purchaseProd.prodNo" 		column="prod_no" />
-	
-	<result property="purchaseProd.prodName" column="prod_name" />
-	<result property="purchaseProd.price" 			column="price" />
+	<result property="purchaseProd.prodNo" 		column="prod_no" />	
+	<result property="purchaseProd.prodName" 	column="prod_name" />
+	<result property="purchaseProd.price" 		column="price" />
 			
-	<result property="divyAddr"				column="demailaddr" 			jdbcType="VARCHAR" />
-	<result property="divyDate" 			column="dlvy_date" 				jdbcType="DATE" />
-	<result property="divyRequest" 		column="dlvy_request" 		jdbcType="VARCHAR" />
-	<result property="orderDate" 			column="order_data" 			jdbcType="DATE" />
-	<result property="paymentOption"	column="payment_option" 	jdbcType="CHAR" />
+	<result property="divyAddr"				column="demailaddr" 		jdbcType="VARCHAR" />
+	<result property="divyDate" 			column="dlvy_date" 			jdbcType="DATE" />
+	<result property="divyRequest" 			column="dlvy_request" 		jdbcType="VARCHAR" />
+	<result property="orderDate" 			column="order_data" 		jdbcType="DATE" />
+	<result property="paymentOption"		column="payment_option" 	jdbcType="CHAR" />
 	<result property="receiverName" 		column="receiver_name" 		jdbcType="VARCHAR"  />
-	<result property="receiverPhone" 	column="receiver_phone" 	jdbcType="VARCHAR"  />
+	<result property="receiverPhone" 		column="receiver_phone" 	jdbcType="VARCHAR"  />
 	<result property="tranCode" 			column="tran_status_code" 	jdbcType="CHAR"  />
-	<result property="tranNo" 				column="tran_no" 				jdbcType="NUMERIC"  />
+	<result property="tranNo" 				column="tran_no" 			jdbcType="NUMERIC"  />
+	<result property="stock" 				column="stock" 				jdbcType="NUMERIC"  />
 </resultMap>
 
-<insert id="addPurchase" parameterType="purchase" >
+	<insert id="addPurchase" parameterType="purchase" >
 	INSERT INTO
 	transaction ( tran_no, prod_no, buyer_id,
 						 payment_option, receiver_name, receiver_phone,
-						 demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date )
+						 demailaddr, dlvy_request, tran_status_code,
+						 order_data, dlvy_date, stock )
 	VALUES ( seq_transaction_tran_no.nextval, #{purchaseProd.prodNo}, #{buyer.userId},
 					 #{paymentOption},	#{receiverName}, #{receiverPhone},
-					  #{divyAddr}, #{divyRequest}, 1, SYSDATE, #{divyDate} )
+					  #{divyAddr}, #{divyRequest}, 1,
+					  SYSDATE, #{divyDate}, #{stock} )
 	</insert>
+	
+	<update id="sold" parameterType="purchase">
+		UPDATE
+		stock
+		<set>
+		stock = (stock-#{stock}), sales_volume = (sales_volume+#{stock})
+		</set>
+		WHERE prod_no = #{purchaseProd.prodNo}
+	</update>
 	
 	<select id="getPurchase" parameterType="int" resultMap="purchaseMap">
 	SELECT
 	tran_no, prod_no, buyer_id, payment_option, receiver_name,
-	receiver_phone, demailaddr, dlvy_date, dlvy_request, tran_status_code
+	receiver_phone, demailaddr,order_data, dlvy_date, dlvy_request, tran_status_code, stock
 	FROM transaction 
 	WHERE
 	tran_no = #{value}
@@ -47,7 +58,7 @@
 	<select id="getPurchase2" parameterType="int" resultMap="purchaseMap">
 	SELECT
 	tran_no, prod_no, buyer_id, payment_option, receiver_name,
-	receiver_phone, demailaddr, dlvy_request, tran_status_code
+	receiver_phone, demailaddr,order_data, dlvy_date, dlvy_request, tran_status_code, stock
 	FROM transaction 
 	WHERE
 	prod_no = #{value}
@@ -76,7 +87,7 @@
 	WHERE tran_no = #{tranNo}
 	</update>
 	
-		<update id="updateTranCode2" parameterType="purchase" >
+	<update id="updateTranCode2" parameterType="purchase" >
 	UPDATE
 	transaction 
 	<set>
@@ -112,7 +123,8 @@
 	  	SELECT *
 	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
 	  					FROM		(	SELECT
-	  	tr.tran_no, pd.prod_name, pd.price, tr.buyer_id, tr.demailaddr, tr.dlvy_request, tr.tran_status_code
+	  	tr.tran_no, pd.prod_name, pd.price, 
+	  	tr.buyer_id, tr.demailaddr, tr.dlvy_request, tr.tran_status_code
 	  	FROM product pd, transaction tr
 	  	WHERE pd.prod_no=tr.prod_no
 	  	AND tr.tran_status_code IS NOT NULL

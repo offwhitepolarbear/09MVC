@@ -30,6 +30,12 @@ public class PurchaseDaoImpl implements PurchaseDao{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public int stockPurchase(Purchase purchase) throws Exception {
+		// TODO Auto-generated method stub
+		return sqlSession.update("PurchaseMapper.sold", purchase);
+	}
 
 	@Override
 	public Purchase getPurchase(int tranNo) throws Exception {
@@ -87,6 +93,7 @@ public class PurchaseDaoImpl implements PurchaseDao{
 		// TODO Auto-generated method stub
 		return sqlSession.selectOne("PurchaseMapper.getSaleCount", search);
 	}
+	
 
 
 }

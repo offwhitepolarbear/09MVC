@@ -34,6 +34,12 @@ public class PurchaseServiceImpl implements PurchaseService{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public int stockPurchase(Purchase purchase) throws Exception {
+		// TODO Auto-generated method stub
+		return purchaseDao.stockPurchase(purchase);
+	}
 
 	@Override
 	public Purchase getPurchase(int tranNo) throws Exception {
@@ -92,7 +98,5 @@ public class PurchaseServiceImpl implements PurchaseService{
 		// TODO Auto-generated method stub
 		return purchaseDao.updateTranCode(purchase);
 	}
-
-
 
 }

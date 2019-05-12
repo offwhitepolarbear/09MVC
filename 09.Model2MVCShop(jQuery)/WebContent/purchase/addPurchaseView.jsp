@@ -7,7 +7,7 @@
 
 <title>Insert title here</title>
 
-<script type="text/javascript" src="../javascript/calendar.js">
+<script type="text/javascript" src="/javascript/calendar.js">
 </script>
 
 <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -185,6 +185,16 @@ $(function() {
 							style="width: 100px; height: 19px" maxLength="20" />
 		</td>
 	</tr>
+	
+	<tr>
+		<td width="104" class="ct_write">±¸ÀÔ°¹¼ö</td>
+		<td bgcolor="D6D6D6" width="1"></td>
+		<td class="ct_write01">
+			<input		type="text" name="stock" 	class="ct_input_g" 
+							style="width: 100px; height: 19px" maxLength="20" />
+		</td>
+	</tr>
+	
 	<tr>
 		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
 	</tr>
@@ -194,7 +204,7 @@ $(function() {
 		<td width="200" class="ct_write01">
 			<input 	type="text" readonly="readonly" name="divyDate" class="ct_input_g" 
 							style="width: 100px; height: 19px" maxLength="20"/>
-			<img 	src="../images/ct_icon_date.gif" width="15" height="15"	
+			<img 	src="/images/ct_icon_date.gif" width="15" height="15"	
 						onclick="show_calendar('document.addPurchase.divyDate', document.addPurchase.divyDate.value)"/>
 		</td>
 	</tr>

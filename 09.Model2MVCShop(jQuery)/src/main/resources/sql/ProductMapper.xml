@@ -15,6 +15,7 @@
 		<result property="prodNo" 			column="prod_no" 				jdbcType="NUMERIC" />
 		<result property="regDate" 			column="reg_date" 				jdbcType="DATE" />
 		<result property="proTranCode" 	column="tran_status_code" 	jdbcType="CHAR"  />
+		<result property="stock" 			column="stock" 				jdbcType="NUMERIC" />
 	</resultMap>
 	
 	<insert id="addProduct" parameterType="product" >
@@ -26,13 +27,43 @@
 				 	#{price}, #{fileName}, SYSDATE)
 	</insert>
 	
+	<insert id="addStock" parameterType="product" >
+	INSERT INTO
+	stock (prod_no, stock, sales_volume)
+	VALUES (#{prodNo}, #{stock}, 0)
+	</insert>
+	
+	<update id="restock" parameterType="product">
+		UPDATE
+		stock
+		<set>
+		stock = (stock+#{stock})
+		</set>
+		WHERE prod_no = #{prodNo}
+	</update>
+	
+	<select id="getProdNo" parameterType="product" resultType="int">
+	
+	SELECT
+	prod_no
+	FROM product
+	WHERE
+	prod_name = #{prodName}
+	AND price = #{price}
+	AND prod_detail = #{prodDetail}
+	AND manufacture_day = #{manuDate}
+	AND image_file	= #{fileName}
+	</select>
+	
+	
 	<select id="getProduct" parameterType="int" resultMap="productMap">
 	SELECT
-	pd.prod_no, pd.prod_name, pd.prod_detail, 
-	pd.manufacture_day, pd.price, pd.image_file, 
-	pd.reg_date, tr.tran_status_code 
-	FROM product pd, transaction tr 
+	pd.prod_no, pd.prod_name, pd.prod_detail,
+	pd.manufacture_day, pd.price, pd.image_file,
+	pd.reg_date, tr.tran_status_code, s.stock
+	FROM product pd, transaction tr, stock s
 	WHERE pd.prod_no=tr.prod_no(+)
+	AND pd.prod_no=s.prod_no
 	AND pd.prod_no = #{value}
 	</select>
 	
@@ -48,18 +79,19 @@
 		</set>
 		WHERE prod_no = #{prodNo}
 	</update>
+		
 	
 	<select  id="getProductList"  parameterType="search"	resultMap="productMap">
 	  	SELECT *
 	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
 	  					FROM		(		SELECT
 	pd.prod_no, pd.prod_name, pd.prod_detail, 
-	pd.manufacture_day, pd.price, pd.image_file, 
-	pd.reg_date, tr.tran_status_code 
-	FROM product pd, transaction tr 
+	pd.manufacture_day, pd.price, pd.image_file,
+	pd.reg_date, tr.tran_status_code, s.stock
+	FROM product pd, transaction tr , stock s
 	<where>
 		pd.prod_no=tr.prod_no(+)
-		
+		AND pd.prod_no=s.prod_no
 		<if test="listSale==0"></if>
 		<if test="listSale==1">
 		AND (tr.tran_status_code IS NULL OR tr.tran_status_code =4)

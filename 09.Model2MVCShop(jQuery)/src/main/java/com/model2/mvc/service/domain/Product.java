@@ -10,7 +10,9 @@ public class Product {
 	private String prodName;
 	private int prodNo;
 	private Date regDate;
+	
 	private String proTranCode;
+	private int stock;
 	
 	public Product(){
 	}
@@ -66,8 +68,16 @@ public class Product {
 
 	// Override
 	public String toString() {
-		return "Product : [fileName]" + fileName
-				+ "[manuDate]" + manuDate+ "[price]" + price + "[prodDetail]" + prodDetail
-				+ "[prodName]" + prodName + "[prodNo]" + prodNo;
+		return "Product : [fileName] : " + fileName
+			+ "[manuDate] : " + manuDate+ "[price] : " + price + "[prodDetail] : " + prodDetail
+			+ "[prodName] : " + prodName + "[prodNo] : " + prodNo +"[stock] : "+stock;
+	}
+
+	public int getStock() {
+		return stock;
+	}
+
+	public void setStock(int stock) {
+		this.stock = stock;
 	}	
 }

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -70,7 +71,7 @@ public class ProductController {
 		System.out.println("/product/addProduct : POST");
 		product.setManuDate(product.getManuDate().substring(2, 10));
 		List<MultipartFile> files = multipartHttpServletRequest.getFiles("uploadFile");
-		System.out.println("몇개 파일들어왔나 : "+files.size());
+		System.out.println("들어온 파일 갯수 : "+files.size());
 		System.out.println(filePath+"저장경로입니다.");
 			product.setFileName(files.get(0).getOriginalFilename());		
 		
@@ -78,25 +79,44 @@ public class ProductController {
 			 File file = new File(filePath, files.get(i).getOriginalFilename());
 			files.get(i).transferTo(file);
 		}
-		
-		//상대경로를 찾아봅시다.
-		//String filePath2=session.getServletContext().getRealPath("/");
-		//System.out.println("저장될 경로좀 출력좀 해봐"+filePath2);
-		//filePath2="C:\\workspace\\09.Model2MVCShop(jQuery)\\WebContent\\images\\uploadFiles";
-		
-		//
-		//File file = new File(filePath, uploadFile.getOriginalFilename());		
-		//uploadFile.transferTo(file);
-		
-		productService.addProduct(product);
 
+		productService.addProduct(product);
+		
+		product.setProdNo(productService.getProdNo(product));
+		
+		System.out.println("프로드넘 들어갔나 찍어봐 : "+product.getProdNo());
+		
+		productService.addStock(product);
+		
+		return "redirect:/product/listProduct?menu=manage";
+	}
+	
+	@RequestMapping( value="restockView/{prodNo}", method=RequestMethod.GET )
+	public String restockView( @PathVariable String prodNo, Model model) throws Exception {
+		//@RequestParam("uploadFile") MultipartFile uploadFile,
+		
+		System.out.println("/product/restockView : GET");
+		Product product = productService.getProduct(Integer.parseInt(prodNo));
+		// Model 과 View 연결
+		model.addAttribute("product", product);
+		
+		return "forward:/product/restock.jsp";
+		
+	}
+	
+	@RequestMapping( value="restock", method=RequestMethod.POST )
+	public String restock( @ModelAttribute("product") Product product) throws Exception {
+		
+		System.out.println("/product/restock : POST");
+		
+		productService.restock(product);
 		
 		return "redirect:/product/listProduct?menu=manage";
 	}
 	
 	//@RequestMapping("/getProduct.do")
 	@RequestMapping( value="getProduct", method=RequestMethod.GET )
-	public String getProduct( @RequestParam("prodNo") String prodNo, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public String getProduct(@RequestParam("prodNo") String prodNo, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		//System.out.println("/getProduct.do");
 		System.out.println("/product/getProduct : GET");
@@ -144,7 +164,7 @@ public class ProductController {
 	//@RequestMapping("/updateProductView.do")
 	@RequestMapping( value="updateProduct", method=RequestMethod.GET )
 
-	public String updateUserView( @RequestParam("prodNo") String prodNo , Model model ) throws Exception{
+	public String updateProductView( @RequestParam("prodNo") String prodNo , Model model) throws Exception{
 
 		System.out.println("/product/updateProduct : GET");
 		//Business Logic
@@ -158,81 +178,25 @@ public class ProductController {
 	//@RequestMapping("/updateProduct.do")
 	@RequestMapping( value="updateProduct", method=RequestMethod.POST )
 
-	public String updateProduct( @ModelAttribute("product") Product product,  String prodNo, Model model , HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public String updateProduct( @ModelAttribute("product") Product product, MultipartHttpServletRequest multipartHttpServletRequest) throws Exception{
 
 		System.out.println("/product/updateProduct : POST");
 		
 		System.out.println(product);
 		
 
-		if(FileUpload.isMultipartContent(request)) {
-			String temDir = "C:\\workspace\\09.Model2MVCShop(jQuery)\\WebContent\\images\\uploadFiles";
-			
-			DiskFileUpload fileUpload = new DiskFileUpload();
-			fileUpload.setRepositoryPath(temDir);
-			fileUpload.setSizeMax(1024*1024*10);
-			fileUpload.setSizeThreshold(1024*100);
-			
-			if(request.getContentLength()<fileUpload.getSizeMax()) {
-				
-				//product = new Product();
-				
-				StringTokenizer token = null;
-				
-				List fileItemList = fileUpload.parseRequest(request);
-				
-				int size = fileItemList.size();
-				for (int i = 0 ; i<size; i++) {
-					FileItem fileItem = (FileItem) fileItemList.get(i);
-				
-					if(fileItem.isFormField()) {
-						if(fileItem.getFieldName().equals("manuDate")) {
-							token = new StringTokenizer(fileItem.getString("euc-kr"), "-");
-							String manuDate = token.nextToken()+token.nextToken()+token.nextToken();
-							product.setManuDate(manuDate);
-						}
-						else if(fileItem.getFieldName().equals("prodName"))
-							product.setProdName(fileItem.getString("euc-kr"));
-						else if(fileItem.getFieldName().equals("prodDetail"))
-							product.setProdDetail(fileItem.getString("euc-kr"));
-						else if(fileItem.getFieldName().equals("price"))
-							product.setPrice(Integer.parseInt(fileItem.getString("euc-kr")));
-						else if(fileItem.getFieldName().equals("prodNo"))
-							product.setProdNo(Integer.parseInt(fileItem.getString("euc-kr")));
-						
-					} else {
-						
-						if (fileItem.getSize()>0) {
-							int idx = fileItem.getName().lastIndexOf("\\");
-							
-							if (idx == -1) {
-								idx = fileItem.getName().lastIndexOf("/");
-							}
-							String fileName = fileItem.getName().substring(idx+1);
-							product.setFileName(fileName);
-							try {
-								File uploadedFile = new File(temDir, fileName);
-								fileItem.write(uploadedFile);
-							} catch(IOException e) {
-								System.out.println(e);
-							}
-						}else{
-							product.setFileName("../../images/empty.GIF");
-					}
-				}
-				
-			}
-				
-				productService.updateProduct(product);
-		} else {
-			int overSize = (request.getContentLength() /1000000);
-			System.out.println("올린파일 크기는 "+overSize+"mb 입니다. 파일1mb넘어감 ㅅㄱ" );
-			System.out.println("history.back();</script>");
-			
+		System.out.println("/product/addProduct : POST");
+		product.setManuDate(product.getManuDate().substring(2, 10));
+		List<MultipartFile> files = multipartHttpServletRequest.getFiles("uploadFile");
+		System.out.println("들어온 파일 갯수 : "+files.size());
+		System.out.println(filePath+"저장경로입니다.");
+		product.setFileName(files.get(0).getOriginalFilename());		
+		
+		for (int i = 0; i < files.size(); i++) {
+			 File file = new File(filePath, files.get(i).getOriginalFilename());
+			files.get(i).transferTo(file);
 		}
-		}else {
-			System.out.println("인코딩 타입이 multipart/from-data 가 아닙니다");
-		}
+		productService.updateProduct(product);
 
 		return "redirect:/product/getProduct?prodNo="+product.getProdNo();
 	}

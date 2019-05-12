@@ -18,6 +18,9 @@ public class Purchase {
 	private String tranCode;
 	private int tranNo;
 	
+	private int stock;
+	
+	
 	public Purchase(){
 	}
 	
@@ -37,7 +40,7 @@ public class Purchase {
 		return divyDate;
 	}
 	public void setDivyDate(String divyDate) {
-		this.divyDate = divyDate.replace("-", "/").substring(2);
+		this.divyDate = divyDate;
 	}
 	public String getDivyRequest() {
 		return divyRequest;
@@ -96,6 +99,14 @@ public class Purchase {
 				+ paymentOption + ", purchaseProd=" + purchaseProd
 				+ ", receiverName=" + receiverName + ", receiverPhone="
 				+ receiverPhone + ", tranCode=" + tranCode + ", tranNo="
-				+ tranNo + "]";
+				+ tranNo +", stock = "+stock+ "]";
+	}
+
+	public int getStock() {
+		return stock;
+	}
+
+	public void setStock(int stock) {
+		this.stock = stock;
 	}
 }

@@ -26,6 +26,24 @@ public class ProductServiceImpl implements ProductService {
 		// TODO Auto-generated method stub
 		productDao.addProduct(product);
 	}
+	
+	@Override
+	public void addStock(Product product) throws Exception {
+		// TODO Auto-generated method stub
+		productDao.addStock(product);
+	}
+
+	@Override
+	public void restock(Product product) throws Exception {
+		// TODO Auto-generated method stub
+		productDao.restock(product);
+	}
+	
+	@Override
+	public int getProdNo(Product product) throws Exception {
+		// TODO Auto-generated method stub
+		return productDao.getProdNo(product);
+	}
 
 	@Override
 	public Product getProduct(int prodNo) throws Exception {
@@ -52,5 +70,5 @@ public class ProductServiceImpl implements ProductService {
 		// TODO Auto-generated method stub
 		productDao.updateProduct(product);
 	}
-	
+
 }

@@ -11,6 +11,8 @@ public interface PurchaseService {
 
 	public int addPurchase(Purchase purchase) throws Exception;
 	
+	public int stockPurchase(Purchase purchase) throws Exception;
+	
 	public Purchase getPurchase(int tranNo) throws Exception;
 	
 	public Purchase getPurchase2(int ProdNo) throws Exception;
